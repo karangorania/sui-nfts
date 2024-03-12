@@ -2,13 +2,17 @@
 import Image from 'next/image';
 import { crippy_kid } from '../assets';
 
-import { TransactionBlock } from '@mysten/sui.js';
-import { useWalletKit } from '@mysten/wallet-kit';
+import { useSignAndExecuteTransactionBlock } from '@mysten/dapp-kit';
+import { useCurrentAccount, useSignTransactionBlock } from '@mysten/dapp-kit';
+import { TransactionBlock } from '@mysten/sui.js/transactions';
+
 import { useState } from 'react';
 import Link from 'next/link';
 
 export default function Home() {
-  const { signAndExecuteTransactionBlock } = useWalletKit();
+  const currentAcc = useCurrentAccount();
+  const { mutate: signAndExecuteTransactionBlock } =
+    useSignAndExecuteTransactionBlock();
   const [digest, setDigest] = useState<string | null>(null);
 
   const mint = async () => {
@@ -19,11 +23,23 @@ export default function Home() {
         target: `${process.env.NEXT_PUBLIC_PACKAGE_ID}::infected_kid::mint`,
       });
 
-      const result = await signAndExecuteTransactionBlock({
-        transactionBlock: tx,
-      });
-      setDigest(result.digest);
-      console.log(result.digest);
+      const response = await signAndExecuteTransactionBlock(
+        {
+          transactionBlock: tx,
+          options: {
+            showEffects: true,
+            showBalanceChanges: true,
+            showEvents: true,
+          },
+        },
+        {
+          onSuccess: (result) => {
+            console.log(result);
+            setDigest(result.digest);
+          },
+        }
+      );
+      console.log(response);
     } catch (error) {
       console.error(error);
     }

@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { ConnectButton } from '@mysten/wallet-kit';
+import { ConnectButton } from '@mysten/dapp-kit';
 
 const Nav = () => {
   return (
