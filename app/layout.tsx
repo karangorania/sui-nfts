@@ -1,7 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { SUIWalletKitProvider } from './providers';
+import { Providers } from './providers';
 import { Navbar } from '@/components';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -18,12 +18,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <SUIWalletKitProvider>
+      <Providers>
         <body className={inter.className}>
           <Navbar />
           {children}
         </body>
-      </SUIWalletKitProvider>
+      </Providers>
     </html>
   );
 }
