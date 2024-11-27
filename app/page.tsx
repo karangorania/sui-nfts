@@ -1,44 +1,46 @@
-'use client';
-import Image from 'next/image';
-import { crippy_kid } from '../assets';
+"use client";
+import Image from "next/image";
+import { crippy_kid } from "../assets";
+import {
+  useCurrentAccount,
+  useSignAndExecuteTransaction,
+} from "@mysten/dapp-kit";
+import { Transaction } from "@mysten/sui/transactions";
 
-import { useSignAndExecuteTransactionBlock } from '@mysten/dapp-kit';
-import { useCurrentAccount, useSignTransactionBlock } from '@mysten/dapp-kit';
-import { TransactionBlock } from '@mysten/sui.js/transactions';
-
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const currentAcc = useCurrentAccount();
-  const { mutate: signAndExecuteTransactionBlock } =
-    useSignAndExecuteTransactionBlock();
+  const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
+
   const [digest, setDigest] = useState<string | null>(null);
 
   const mint = async () => {
     try {
-      const tx = new TransactionBlock();
+      const tx = new Transaction();
 
       tx.moveCall({
         target: `${process.env.NEXT_PUBLIC_PACKAGE_ID}::infected_kid::mint`,
       });
 
-      const response = await signAndExecuteTransactionBlock(
+      const response = await signAndExecuteTransaction(
         {
-          transactionBlock: tx,
-          options: {
-            showEffects: true,
-            showBalanceChanges: true,
-            showEvents: true,
-          },
+          transaction: tx,
+          //   chain: "sui:testnet",
         },
+
         {
           onSuccess: (result) => {
-            console.log(result);
+            console.log("executed transaction", result);
             setDigest(result.digest);
+          },
+          onError: (error) => {
+            console.log("error", error);
           },
         }
       );
+
       console.log(response);
     } catch (error) {
       console.error(error);
@@ -70,7 +72,7 @@ export default function Home() {
       {digest && (
         <div className="mt-[5%]">
           <Link
-            href={`https://suiexplorer.com/txblock/${digest}?network=testnet`}
+            href={`https://explorer.polymedia.app/txblock/${digest}?network=testnet`}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:bg-[#2A4361] bg-[#0084AD] text-white font-bold py-2 px-8 rounded focus:outline-none focus:shadow-outline"
